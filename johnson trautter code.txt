@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define LEFT -1
+#define RIGHT 1
+
+typedef struct {
+    int value;
+    int direction;
+} Element;
+
+void printPermutation(Element *perm, int n) {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", perm[i].value);
+    }
+    printf("\n");
+}
+
+// Find the largest mobile element
+int getMobile(Element *perm, int n) {
+    int mobile = 0;
+    int mobileIndex = -1;
+
+    for (int i = 0; i < n; i++) {
+        int nextIndex = i + perm[i].direction;
+
+        if (nextIndex >= 0 && nextIndex < n) {
+            if (perm[i].value > perm[nextIndex].value && perm[i].value > mobile) {
+                mobile = perm[i].value;
+                mobileIndex = i;
+            }
+        }
+    }
+    return mobileIndex;
+}
+
+void generatePermutations(int n) {
+    Element *perm = (Element *)malloc(n * sizeof(Element));
+
+    // Initialize permutation
+    for (int i = 0; i < n; i++) {
+        perm[i].value = i + 1;
+        perm[i].direction = LEFT;
+    }
+
+    printPermutation(perm, n);
+
+    while (1) {
+        int mobileIndex = getMobile(perm, n);
+
+        if (mobileIndex == -1)
+            break;
+
+        int swapIndex = mobileIndex + perm[mobileIndex].direction;
+
+        // Swap elements
+        Element temp = perm[mobileIndex];
+        perm[mobileIndex] = perm[swapIndex];
+        perm[swapIndex] = temp;
+
+        mobileIndex = swapIndex;
+
+        // Reverse direction of all elements greater than mobile
+        for (int i = 0; i < n; i++) {
+            if (perm[i].value > perm[mobileIndex].value) {
+                perm[i].direction *= -1;
+            }
+        }
+
+        printPermutation(perm, n);
+    }
+
+    free(perm);
+}
+
+int main() {
+    int n;
+    printf("Enter n: ");
+    scanf("%d", &n);
+
+    generatePermutations(n);
+
+    return 0;
+}
